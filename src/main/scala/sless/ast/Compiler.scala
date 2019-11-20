@@ -19,6 +19,11 @@ trait Compiler extends Compilable with Base {
     case ClassNameSelector(s,className) => compileAST(s) + "." + className
     case IdSelector(s,id) => compileAST(s) + "#" + id
     case PseudoClassSelector(s,pseudoClass) => compileAST(s) + ":" + pseudoClass
+    case PseudoElementSelector(s,psuedoElement) =>compileAST(s) + "::" + psuedoElement
+    case DescendantSelector(s,selector) => compileAST(s) + " " + compileAST(selector)
+    case ChildSelector(s,selector) => compileAST(s) + ">" + compileAST(selector)
+    case AdjacentSelector(s,selector) => compileAST(s) + "+" + compileAST(selector)
+    case GeneralSelector(s,selector) => compileAST(s) + "~" + compileAST(selector)
   }
 
   def prettyHelper(compilable: CompilableAST, spaces: Int): String =  compilable match {
@@ -34,6 +39,11 @@ trait Compiler extends Compilable with Base {
     case ClassNameSelector(s, className) => prettyHelper(s,spaces) + "." + className
     case IdSelector(s, id) => prettyHelper(s,spaces) + "#" + id
     case PseudoClassSelector(s, pseudoClass) => prettyHelper(s,spaces) + ":" + pseudoClass
+    case PseudoElementSelector(s, pseudoElement) => prettyHelper(s,spaces) + "::" + pseudoElement
+    case DescendantSelector(s,selector) => prettyHelper(s,spaces) + " " + prettyHelper(selector,spaces)
+    case ChildSelector(s,selector) => prettyHelper(s,spaces) + " > " + prettyHelper(selector,spaces)
+    case AdjacentSelector(s,selector) => prettyHelper(s,spaces) + " + " + prettyHelper(selector,spaces)
+    case GeneralSelector(s,selector) => prettyHelper(s,spaces) + " ~ " + prettyHelper(selector,spaces)
   }
 }
 //case class UniversalSelector() extends  SelectorAST
