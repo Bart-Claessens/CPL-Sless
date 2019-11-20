@@ -3,30 +3,30 @@ package sless.ast
 import sless.dsl.Compilable
 
 trait Compiler extends Compilable with Base {
-  override def compile(sheet: CssAST): String = compileAST(sheet)
+  override def compile(sheet: CssAST): String = compileHelper(sheet)
 
   override def pretty(sheet: CssAST, spaces: Int): String = prettyHelper(sheet,spaces)
 
-  def compileAST(compilable: CompilableAST): String =  compilable match {
-    case CssAST(rules) => rules.map(c => compileAST(c)).mkString("")
-    case ARule(s,declarations) => compileAST(s) + "{" + declarations.map(d => compileAST(d)).mkString("") + "}"
-    case ADeclaration(p, value) => compileAST(p)+ ":" + compileAST(value) + ";"
+  def compileHelper(compilable: CompilableAST): String =  compilable match {
+    case CssAST(rules) => rules.map(c => compileHelper(c)).mkString("")
+    case ARule(s,declarations) => compileHelper(s) + "{" + declarations.map(d => compileHelper(d)).mkString("") + "}"
+    case ADeclaration(p, value) => compileHelper(p)+ ":" + compileHelper(value) + ";"
     case AValue(value) => value
     case AProperty(value) => value
     case UniversalSelector() => "*"
     case TypeSelector(tipe) => tipe
-    case GroupSelector(selectors) => selectors.map(s => compileAST(s)).mkString(",")
-    case ClassNameSelector(s,className) => compileAST(s) + "." + className
-    case IdSelector(s,id) => compileAST(s) + "#" + id
-//    case AttributeSelector(s,attr,value) =>
-    case PseudoClassSelector(s,pseudoClass) => compileAST(s) + ":" + pseudoClass
-    case PseudoElementSelector(s,psuedoElement) =>compileAST(s) + "::" + psuedoElement
-    case DescendantSelector(s,selector) => compileAST(s) + " " + compileAST(selector)
-    case ChildSelector(s,selector) => compileAST(s) + ">" + compileAST(selector)
-    case AdjacentSelector(s,selector) => compileAST(s) + "+" + compileAST(selector)
-    case GeneralSelector(s,selector) => compileAST(s) + "~" + compileAST(selector)
-    case CommentDeclaration(d,comment) => compileAST(d) + "/* " + comment + " */"
-    case CommentRule(r,comment) => "/* " + comment + " */" + compileAST(r)
+    case GroupSelector(selectors) => selectors.map(s => compileHelper(s)).mkString(",")
+    case ClassNameSelector(s,className) => compileHelper(s) + "." + className
+    case IdSelector(s,id) => compileHelper(s) + "#" + id
+    case AttributeSelector(s,attr,value) => compileHelper(s) + "[" + attr + "=" +  value + "]"
+    case PseudoClassSelector(s,pseudoClass) => compileHelper(s) + ":" + pseudoClass
+    case PseudoElementSelector(s,psuedoElement) =>compileHelper(s) + "::" + psuedoElement
+    case DescendantSelector(s,selector) => compileHelper(s) + " " + compileHelper(selector)
+    case ChildSelector(s,selector) => compileHelper(s) + ">" + compileHelper(selector)
+    case AdjacentSelector(s,selector) => compileHelper(s) + "+" + compileHelper(selector)
+    case GeneralSelector(s,selector) => compileHelper(s) + "~" + compileHelper(selector)
+    case CommentDeclaration(d,comment) => compileHelper(d) + "/* " + comment + " */"
+    case CommentRule(r,comment) => "/* " + comment + " */" + compileHelper(r)
   }
 
   def prettyHelper(compilable: CompilableAST, spaces: Int): String =  compilable match {
@@ -41,7 +41,7 @@ trait Compiler extends Compilable with Base {
     case GroupSelector(selectors) => selectors.map(s => prettyHelper(s,spaces)).mkString(", ")
     case ClassNameSelector(s, className) => prettyHelper(s,spaces) + "." + className
     case IdSelector(s, id) => prettyHelper(s,spaces) + "#" + id
-//    case AttributeSelector(s,attr,value) =>
+    case AttributeSelector(s,attr,value) =>prettyHelper(s,spaces) + "[" + attr + "=" +  value + "]"
     case PseudoClassSelector(s, pseudoClass) => prettyHelper(s,spaces) + ":" + pseudoClass
     case PseudoElementSelector(s, pseudoElement) => prettyHelper(s,spaces) + "::" + pseudoElement
     case DescendantSelector(s,selector) => prettyHelper(s,spaces) + " " + prettyHelper(selector,spaces)
