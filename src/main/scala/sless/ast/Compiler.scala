@@ -18,6 +18,7 @@ trait Compiler extends Compilable with Base {
     case GroupSelector(selectors) => selectors.map(s => compileAST(s)).mkString(",")
     case ClassNameSelector(s,className) => compileAST(s) + "." + className
     case IdSelector(s,id) => compileAST(s) + "#" + id
+//    case AttributeSelector(s,attr,value) =>
     case PseudoClassSelector(s,pseudoClass) => compileAST(s) + ":" + pseudoClass
     case PseudoElementSelector(s,psuedoElement) =>compileAST(s) + "::" + psuedoElement
     case DescendantSelector(s,selector) => compileAST(s) + " " + compileAST(selector)
@@ -40,11 +41,14 @@ trait Compiler extends Compilable with Base {
     case GroupSelector(selectors) => selectors.map(s => prettyHelper(s,spaces)).mkString(", ")
     case ClassNameSelector(s, className) => prettyHelper(s,spaces) + "." + className
     case IdSelector(s, id) => prettyHelper(s,spaces) + "#" + id
+//    case AttributeSelector(s,attr,value) =>
     case PseudoClassSelector(s, pseudoClass) => prettyHelper(s,spaces) + ":" + pseudoClass
     case PseudoElementSelector(s, pseudoElement) => prettyHelper(s,spaces) + "::" + pseudoElement
     case DescendantSelector(s,selector) => prettyHelper(s,spaces) + " " + prettyHelper(selector,spaces)
     case ChildSelector(s,selector) => prettyHelper(s,spaces) + " > " + prettyHelper(selector,spaces)
     case AdjacentSelector(s,selector) => prettyHelper(s,spaces) + " + " + prettyHelper(selector,spaces)
     case GeneralSelector(s,selector) => prettyHelper(s,spaces) + " ~ " + prettyHelper(selector,spaces)
+    case CommentDeclaration(d,comment) => prettyHelper(d,spaces) + " /* " + comment + " */"
+    case CommentRule(r,comment) => "/* " + comment + " */\n" + prettyHelper(r,spaces)
   }
 }
