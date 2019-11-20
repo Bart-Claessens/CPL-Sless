@@ -3,7 +3,7 @@ package sless.ast
 import sless.dsl.{BaseDSL, Compilable, PropertyDSL, SelectorDSL, ValueDSL}
 
 
-class Base extends BaseDSL with ValueDSL with PropertyDSL with SelectorDSL with Compilable{
+trait Base extends BaseDSL with ValueDSL with PropertyDSL with SelectorDSL with Compilable{
   override type Rule = RuleAST
   override type Css = CssAST
   override type Selector = SelectorAST

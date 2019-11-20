@@ -4,5 +4,6 @@ import sless.ast.Base
 
 object CssImplementation {
   type DSL = PropertyDSL with SelectorDSL with ValueDSL with Compilable
-  val dsl: DSL = new Base()
+  object BaseC extends Base
+  val dsl: DSL = BaseC
 }
