@@ -25,19 +25,19 @@ class CssTest extends FunSuite {
       CssImplementation.dsl.compile(ex) ===
         """*.class-name1,*.class-name2{width:100%;}div#container{background-color:blue;}div#container:hover{background-color:red;}""")
 
-//    assert(
-//      CssImplementation.dsl.pretty(ex, 4) ===
-//        """*.class-name1, *.class-name2 {
-//    width: 100%;
-//}
-//
-//div#container {
-//    background-color: blue;
-//}
-//
-//div#container:hover {
-//    background-color: red;
-//}""")
+    assert(
+      CssImplementation.dsl.pretty(ex, 4) ===
+        """*.class-name1, *.class-name2 {
+    width: 100%;
+}
+
+div#container {
+    background-color: blue;
+}
+
+div#container:hover {
+    background-color: red;
+}""")
   }
 
   test("Assignment CSS") {

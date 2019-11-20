@@ -3,7 +3,7 @@ package sless.ast
 import sless.dsl.{BaseDSL, Compilable, PropertyDSL, SelectorDSL, ValueDSL}
 
 
-trait Base extends BaseDSL with ValueDSL with PropertyDSL with SelectorDSL with Compilable{
+trait Base extends BaseDSL {
   override type Rule = RuleAST
   override type Css = CssAST
   override type Selector = SelectorAST
@@ -13,7 +13,8 @@ trait Base extends BaseDSL with ValueDSL with PropertyDSL with SelectorDSL with 
 
   protected def fromRules(rules: Seq[Rule]): CssAST = CssAST(rules)
 
-  sealed trait SelectorAST
+  sealed abstract class CompilableAST
+  sealed abstract class SelectorAST extends CompilableAST
   case class UniversalSelector() extends  SelectorAST
   case class TypeSelector(string: String) extends  SelectorAST
   case class GroupSelector(selectors: Seq[SelectorAST]) extends  SelectorAST
@@ -30,53 +31,21 @@ trait Base extends BaseDSL with ValueDSL with PropertyDSL with SelectorDSL with 
   case class AdjacentSelector(s: SelectorAST, selector: SelectorAST) extends  SelectorAST
   case class GeneralSelector(s: SelectorAST, selector: SelectorAST) extends  SelectorAST
 
-  case class CssAST(rules : Seq[RuleAST])
+  case class CssAST(rules : Seq[RuleAST]) extends CompilableAST
 
-  case class RuleAST(s: SelectorAST, declarations: Seq[DeclarationAST])
+  case class RuleAST(s: SelectorAST, declarations: Seq[DeclarationAST]) extends CompilableAST
 
-  case class DeclarationAST(p: PropertyAST, value: ValueAST)
+  case class DeclarationAST(p: PropertyAST, value: ValueAST) extends CompilableAST
 
-  case class PropertyAST(value: String)
+  case class PropertyAST(value: String) extends CompilableAST
 
-  case class ValueAST(value: String)
+  case class ValueAST(value: String) extends CompilableAST
 
-  override def value(string: String): ValueAST = ValueAST(string)
 
-  override def prop(string: String): PropertyAST = PropertyAST(string)
 
-  override protected def assign(p: PropertyAST, value: ValueAST): DeclarationAST = DeclarationAST(p,value)
 
-  override protected def className(s: SelectorAST, string: String): SelectorAST = ClassNameSelector(s,string)
 
-  override protected def id(s: SelectorAST, string: String): SelectorAST = IdSelector(s,string)
 
-  override protected def attribute(s: SelectorAST, attr: String, value: ValueAST): SelectorAST = AttributeSelector(s,attr,value)
 
-  override protected def pseudoClass(s: SelectorAST, string: String): SelectorAST = PseudoClassSelector(s,string)
 
-  override protected def pseudoElement(s: SelectorAST, string: String): SelectorAST = PseudoElementSelector(s,string)
-
-  /** -> s + selector { ... } */
-  override protected def adjacent(s: SelectorAST, selector: SelectorAST): SelectorAST = AdjacentSelector(s,selector)
-
-  /** -> s ~ selector { ... } */
-  override protected def general(s: SelectorAST, selector: SelectorAST): SelectorAST = GeneralSelector(s,selector)
-
-  /** -> s > selector { ... } */
-  override protected def child(s: SelectorAST, selector: SelectorAST): SelectorAST = ChildSelector(s,selector)
-
-  /** -> s selector { ... } */
-  override protected def descendant(s: SelectorAST, selector: SelectorAST): SelectorAST = DescendantSelector(s,selector)
-
-  override protected def group(selectors: Seq[SelectorAST]): SelectorAST = GroupSelector(selectors)
-
-  override def tipe(string: String): SelectorAST = TypeSelector(string)
-
-  override val All: SelectorAST = UniversalSelector()
-
-  override protected def bindTo(s: SelectorAST, declarations: Seq[DeclarationAST]): RuleAST = RuleAST(s,declarations)
-
-  override def compile(sheet: CssAST): String = """*.class-name1,*.class-name2{width:100%;}div#container{background-color:blue;}div#container:hover{background-color:red;}"""
-
-  override def pretty(sheet: CssAST, spaces: Int): String = ""
 }
