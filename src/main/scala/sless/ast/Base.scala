@@ -33,13 +33,19 @@ trait Base extends BaseDSL {
 
   case class CssAST(rules : Seq[RuleAST]) extends CompilableAST
 
-  case class RuleAST(s: SelectorAST, declarations: Seq[DeclarationAST]) extends CompilableAST
+  sealed abstract class RuleAST extends CompilableAST
+  case class ARule(s: SelectorAST, declarations: Seq[DeclarationAST]) extends RuleAST
+  case class CommentRule(r: RuleAST, comment: String) extends RuleAST
 
-  case class DeclarationAST(p: PropertyAST, value: ValueAST) extends CompilableAST
+  sealed abstract class DeclarationAST extends CompilableAST
+  case class ADeclaration(p: PropertyAST, value: ValueAST) extends DeclarationAST
+  case class CommentDeclaration(d: DeclarationAST, comment: String) extends DeclarationAST
 
-  case class PropertyAST(value: String) extends CompilableAST
+  sealed abstract class PropertyAST extends CompilableAST
+  case class AProperty(value: String) extends PropertyAST
 
-  case class ValueAST(value: String) extends CompilableAST
+  sealed abstract class ValueAST extends CompilableAST
+  case class AValue(value: String) extends ValueAST
 
 
 

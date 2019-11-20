@@ -9,10 +9,10 @@ trait Compiler extends Compilable with Base {
 
   def compileAST(compilable: CompilableAST): String =  compilable match {
     case CssAST(rules) => rules.map(c => compileAST(c)).mkString("")
-    case RuleAST(s,declarations) => compileAST(s) + "{" + declarations.map(d => compileAST(d)).mkString("") + "}"
-    case DeclarationAST(p, value) => compileAST(p)+ ":" + compileAST(value) + ";"
-    case ValueAST(value) => value
-    case PropertyAST(value) => value
+    case ARule(s,declarations) => compileAST(s) + "{" + declarations.map(d => compileAST(d)).mkString("") + "}"
+    case ADeclaration(p, value) => compileAST(p)+ ":" + compileAST(value) + ";"
+    case AValue(value) => value
+    case AProperty(value) => value
     case UniversalSelector() => "*"
     case TypeSelector(tipe) => tipe
     case GroupSelector(selectors) => selectors.map(s => compileAST(s)).mkString(",")
@@ -24,15 +24,17 @@ trait Compiler extends Compilable with Base {
     case ChildSelector(s,selector) => compileAST(s) + ">" + compileAST(selector)
     case AdjacentSelector(s,selector) => compileAST(s) + "+" + compileAST(selector)
     case GeneralSelector(s,selector) => compileAST(s) + "~" + compileAST(selector)
+    case CommentDeclaration(d,comment) => compileAST(d) + "/* " + comment + " */"
+    case CommentRule(r,comment) => "/* " + comment + " */" + compileAST(r)
   }
 
   def prettyHelper(compilable: CompilableAST, spaces: Int): String =  compilable match {
     case CssAST(rules) => rules.map(c => prettyHelper(c,spaces)).mkString("\n\n")
-    case RuleAST(s, declarations)
+    case ARule(s, declarations)
       => prettyHelper(s,spaces) + " {\n" + declarations.map(d => prettyHelper(d,spaces)).mkString("\n") + "\n}"
-    case DeclarationAST(p, value) => " " * spaces + prettyHelper(p,spaces) + ": " + prettyHelper(value,spaces) + ";"
-    case ValueAST(value) => value
-    case PropertyAST(value) => value
+    case ADeclaration(p, value) => " " * spaces + prettyHelper(p,spaces) + ": " + prettyHelper(value,spaces) + ";"
+    case AValue(value) => value
+    case AProperty(value) => value
     case UniversalSelector() => "*"
     case TypeSelector(tipe) => tipe
     case GroupSelector(selectors) => selectors.map(s => prettyHelper(s,spaces)).mkString(", ")
@@ -46,18 +48,3 @@ trait Compiler extends Compilable with Base {
     case GeneralSelector(s,selector) => prettyHelper(s,spaces) + " ~ " + prettyHelper(selector,spaces)
   }
 }
-//case class UniversalSelector() extends  SelectorAST
-//case class TypeSelector(string: String) extends  SelectorAST
-//case class GroupSelector(selectors: Seq[SelectorAST]) extends  SelectorAST
-//
-//case class ClassNameSelector(s: SelectorAST, string: String) extends  SelectorAST
-//case class IdSelector(s: SelectorAST, string: String) extends  SelectorAST
-//case class AttributeSelector(s: SelectorAST, attr: String, value: ValueAST) extends  SelectorAST
-//
-//case class PseudoClassSelector(s: SelectorAST, string: String) extends  SelectorAST
-//case class PseudoElementSelector(s: SelectorAST, string: String) extends  SelectorAST
-//
-//case class DescendantSelector(s: SelectorAST, selector: SelectorAST) extends  SelectorAST
-//case class ChildSelector(s: SelectorAST, selector: SelectorAST) extends  SelectorAST
-//case class AdjacentSelector(s: SelectorAST, selector: SelectorAST) extends  SelectorAST
-//case class GeneralSelector(s: SelectorAST, selector: SelectorAST) extends  SelectorAST
