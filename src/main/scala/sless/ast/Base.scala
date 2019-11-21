@@ -14,6 +14,13 @@ trait Base extends BaseDSL {
   protected def fromRules(rules: Seq[Rule]): CssAST = CssAST(rules)
 
   sealed abstract class CompilableAST
+
+  case class CssAST(rules : Seq[RuleAST]) extends CompilableAST
+
+  sealed abstract class RuleAST extends CompilableAST
+  case class ARule(s: SelectorAST, declarations: Seq[DeclarationAST]) extends RuleAST
+  case class CommentRule(r: RuleAST, comment: String) extends RuleAST
+
   sealed abstract class SelectorAST extends CompilableAST
   case class UniversalSelector() extends  SelectorAST
   case class TypeSelector(string: String) extends  SelectorAST
@@ -30,12 +37,6 @@ trait Base extends BaseDSL {
   case class ChildSelector(s: SelectorAST, selector: SelectorAST) extends  SelectorAST
   case class AdjacentSelector(s: SelectorAST, selector: SelectorAST) extends  SelectorAST
   case class GeneralSelector(s: SelectorAST, selector: SelectorAST) extends  SelectorAST
-
-  case class CssAST(rules : Seq[RuleAST]) extends CompilableAST
-
-  sealed abstract class RuleAST extends CompilableAST
-  case class ARule(s: SelectorAST, declarations: Seq[DeclarationAST]) extends RuleAST
-  case class CommentRule(r: RuleAST, comment: String) extends RuleAST
 
   sealed abstract class DeclarationAST extends CompilableAST
   case class ADeclaration(p: PropertyAST, value: ValueAST) extends DeclarationAST
