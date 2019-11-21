@@ -7,7 +7,7 @@ trait Lint extends LintDSL with Base {
     * Check if the given sheet has any style rules without declarations, i.e. of the form "selector {}"
     */
   override def removeEmptyRules(css: CssAST): (Boolean, CssAST) =
-    ( css.rules.map(isEmptyRule).fold(false)(_ || _) , CssAST(css.rules.filterNot(isEmptyRule)))
+    ( css.rules.exists(isEmptyRule) , CssAST(css.rules.filterNot(isEmptyRule)))
 
 
   def isEmptyRule(rule: RuleAST): Boolean = rule match {
