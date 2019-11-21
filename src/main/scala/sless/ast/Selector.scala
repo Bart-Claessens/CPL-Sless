@@ -29,7 +29,7 @@ trait Selector extends SelectorDSL with Base {
 
   override def tipe(string: String): SelectorAST = TypeSelector(string)
 
-  override val All: SelectorAST = UniversalSelector()
+  override val All: SelectorAST = UniversalSelector
 
   override protected def bindTo(s: SelectorAST, declarations: Seq[DeclarationAST]): RuleAST = ARule(s,declarations)
 }

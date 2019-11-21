@@ -13,7 +13,7 @@ trait Compiler extends Compilable with Base {
     case ADeclaration(p, value) => compileHelper(p)+ ":" + compileHelper(value) + ";"
     case AValue(value) => value
     case AProperty(value) => value
-    case UniversalSelector() => "*"
+    case UniversalSelector => "*"
     case TypeSelector(tipe) => tipe
     case GroupSelector(selectors) => selectors.map(s => compileHelper(s)).mkString(",")
     case ClassNameSelector(s,className) => compileHelper(s) + "." + className
@@ -36,7 +36,7 @@ trait Compiler extends Compilable with Base {
     case ADeclaration(p, value) => " " * spaces + prettyHelper(p,spaces) + ": " + prettyHelper(value,spaces) + ";"
     case AValue(value) => value
     case AProperty(value) => value
-    case UniversalSelector() => "*"
+    case UniversalSelector => "*"
     case TypeSelector(tipe) => tipe
     case GroupSelector(selectors) => selectors.map(s => prettyHelper(s,spaces)).mkString(", ")
     case ClassNameSelector(s, className) => prettyHelper(s,spaces) + "." + className
