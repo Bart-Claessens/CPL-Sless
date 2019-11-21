@@ -15,6 +15,7 @@ class LessLintTest extends FunSuite{
       },
     )
 
+
    val (lintedBool, lintedEx) = removeEmptyRules(ex)
     assert(lintedBool === true)
     assert(
