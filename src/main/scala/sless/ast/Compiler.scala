@@ -3,12 +3,12 @@ package sless.ast
 import sless.dsl.Compilable
 
 trait Compiler extends Compilable with Base {
-  override def compile(sheet: CssAST): String = compileHelper(sheet)
+  override def compile(sheet: Css): String = compileHelper(sheet)
 
-  override def pretty(sheet: CssAST, spaces: Int): String = prettyHelper(sheet,spaces)
+  override def pretty(sheet: Css, spaces: Int): String = prettyHelper(sheet,spaces)
 
   def compileHelper(compilable: CompilableAST): String =  compilable match {
-    case CssAST(rules) => rules.map(c => compileHelper(c)).mkString("")
+    case ACss(rules) => rules.map(r => compileHelper(r)).mkString("")
     case ARule(s,declarations) => compileHelper(s) + "{" + declarations.map(d => compileHelper(d)).mkString("") + "}"
     case ADeclaration(p, value) => compileHelper(p)+ ":" + compileHelper(value) + ";"
     case AValue(value) => value
@@ -30,7 +30,7 @@ trait Compiler extends Compilable with Base {
   }
 
   def prettyHelper(compilable: CompilableAST, spaces: Int): String =  compilable match {
-    case CssAST(rules) => rules.map(c => prettyHelper(c,spaces)).mkString("\n\n")
+    case ACss(rules) => rules.map(r => prettyHelper(r,spaces)).mkString("\n\n")
     case ARule(s, declarations)
       => prettyHelper(s,spaces) + " {\n" + declarations.map(d => prettyHelper(d,spaces)).mkString("\n") + "\n}"
     case ADeclaration(p, value) => " " * spaces + prettyHelper(p,spaces) + ": " + prettyHelper(value,spaces) + ";"

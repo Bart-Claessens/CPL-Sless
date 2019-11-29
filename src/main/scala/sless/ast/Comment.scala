@@ -3,9 +3,9 @@ package sless.ast
 import sless.dsl.CommentDSL
 
 trait Comment extends CommentDSL with Base {
-  override protected def commentRule(rule: RuleAST, str: String): RuleAST = CommentRule(rule,str)
+  protected def commentRule(rule: Rule, str: String): Rule = CommentRule(rule,str)
 
-  override protected def commentDeclaration(declaration: DeclarationAST, str: String): DeclarationAST
+  override protected def commentDeclaration(declaration: Declaration, str: String): Declaration
     = CommentDeclaration(declaration,str)
 
 

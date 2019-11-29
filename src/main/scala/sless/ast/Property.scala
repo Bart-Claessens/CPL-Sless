@@ -3,16 +3,16 @@ package sless.ast
 import sless.dsl.PropertyDSL
 
 trait Property extends PropertyDSL with Base{
-  override def prop(string: String): PropertyAST = AProperty(string)
+  override def prop(string: String): Property = AProperty(string)
 
-  override protected def assign(p: PropertyAST, value: ValueAST): DeclarationAST = ADeclaration(p,value)
+  override protected def assign(p: Property, value: Value): Declaration = ADeclaration(p,value)
 
-  def getPropertyFrom(d: DeclarationAST): String = d match {
+  def getPropertyFrom(d: Declaration): String = d match {
     case ADeclaration(AProperty(pvalue), _) => pvalue
     case CommentDeclaration(d, _) => getPropertyFrom(d)
   }
 
-  def getValueOfPropertyFrom(d: DeclarationAST, property: String): Option[String] = d match {
+  def getValueOfPropertyFrom(d: Declaration, property: String): Option[String] = d match {
     case ADeclaration(AProperty(pvalue), AValue(value)) => if (pvalue.equals(property)) Some(value) else None
     case CommentDeclaration(d, _) => getValueOfPropertyFrom(d,property)
   }

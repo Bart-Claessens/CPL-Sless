@@ -11,42 +11,43 @@ trait Base extends BaseDSL {
   override type Property = PropertyAST
   override type Value = ValueAST
 
-  protected def fromRules(rules: Seq[Rule]): CssAST = CssAST(rules)
+  protected def fromRules(rules: Seq[Rule]): Css = ACss(rules)
 
   sealed abstract class CompilableAST
 
-  case class CssAST(rules : Seq[RuleAST]) extends CompilableAST
+  sealed abstract class CssAST extends CompilableAST
+  case class ACss(rules : Seq[Rule]) extends Css
 
   sealed abstract class RuleAST extends CompilableAST
-  case class ARule(s: SelectorAST, declarations: Seq[DeclarationAST]) extends RuleAST
-  case class CommentRule(r: RuleAST, comment: String) extends RuleAST
+  case class ARule(s: Selector, declarations: Seq[Declaration]) extends Rule
+  case class CommentRule(r: Rule, comment: String) extends Rule
 
   sealed abstract class SelectorAST extends CompilableAST
-  case object UniversalSelector extends  SelectorAST
-  case class TypeSelector(string: String) extends  SelectorAST
-  case class GroupSelector(selectors: Seq[SelectorAST]) extends  SelectorAST
+  case object UniversalSelector extends  Selector
+  case class TypeSelector(string: String) extends  Selector
+  case class GroupSelector(selectors: Seq[Selector]) extends  Selector
 
-  case class ClassNameSelector(s: SelectorAST, string: String) extends  SelectorAST
-  case class IdSelector(s: SelectorAST, string: String) extends  SelectorAST
-  case class AttributeSelector(s: SelectorAST, attr: String, value: ValueAST) extends  SelectorAST
+  case class ClassNameSelector(s: Selector, string: String) extends  Selector
+  case class IdSelector(s: Selector, string: String) extends  Selector
+  case class AttributeSelector(s: Selector, attr: String, value: Value) extends  Selector
 
-  case class PseudoClassSelector(s: SelectorAST, string: String) extends  SelectorAST
-  case class PseudoElementSelector(s: SelectorAST, string: String) extends  SelectorAST
+  case class PseudoClassSelector(s: Selector, string: String) extends  Selector
+  case class PseudoElementSelector(s: Selector, string: String) extends  Selector
 
-  case class DescendantSelector(s: SelectorAST, selector: SelectorAST) extends  SelectorAST
-  case class ChildSelector(s: SelectorAST, selector: SelectorAST) extends  SelectorAST
-  case class AdjacentSelector(s: SelectorAST, selector: SelectorAST) extends  SelectorAST
-  case class GeneralSelector(s: SelectorAST, selector: SelectorAST) extends  SelectorAST
+  case class DescendantSelector(s: Selector, selector: Selector) extends  Selector
+  case class ChildSelector(s: Selector, selector: Selector) extends  Selector
+  case class AdjacentSelector(s: Selector, selector: Selector) extends  Selector
+  case class GeneralSelector(s: Selector, selector: Selector) extends  Selector
 
   sealed abstract class DeclarationAST extends CompilableAST
-  case class ADeclaration(p: PropertyAST, value: ValueAST) extends DeclarationAST
-  case class CommentDeclaration(d: DeclarationAST, comment: String) extends DeclarationAST
+  case class ADeclaration(p: Property, value: Value) extends Declaration
+  case class CommentDeclaration(d: Declaration, comment: String) extends Declaration
 
   sealed abstract class PropertyAST extends CompilableAST
-  case class AProperty(value: String) extends PropertyAST
+  case class AProperty(value: String) extends Property
 
   sealed abstract class ValueAST extends CompilableAST
-  case class AValue(value: String) extends ValueAST
+  case class AValue(value: String) extends Value
 
 
 

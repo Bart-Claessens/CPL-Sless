@@ -6,8 +6,8 @@ trait Lint extends LintDSL with Base with Property with Value with Rule {
   /**
     * Check if the given sheet has any style rules without declarations, i.e. of the form "selector {}"
     */
-  override def removeEmptyRules(sheet: CssAST): (Boolean, CssAST) =
-    ( sheet.rules.exists(_.isEmpty) , css(sheet.rules.filterNot(_.isEmpty):_*))
+  override def removeEmptyRules(sheet: Css): (Boolean, Css) =
+    ( sheet.getRules.exists(_.isEmpty) , css(sheet.getRules.filterNot(_.isEmpty):_*))
 
 
   /**
@@ -16,16 +16,16 @@ trait Lint extends LintDSL with Base with Property with Value with Rule {
     * the single shorthand property margin. The new margin property takes the place of the first declaration in order of appearance.
     * The values from the individual prorperties are aggregated in the order top-right-bottom-left, with spaces in between.
     */
-  override def aggregateMargins(sheet: CssAST): (Boolean, CssAST) = {
-    val mappedRules = sheet.rules.map (aggregateMargins)
-    val bool = mappedRules.foldLeft(false){ case(a, (b, _)) => b || a   }
-    val rules = mappedRules.foldLeft(Seq():Seq[RuleAST]){(a,b) => a:+b._2}
+  override def aggregateMargins(sheet: Css): (Boolean, Css) = {
+    val mappedRules = sheet.getRules.map(aggregateMargins)
+    val bool = mappedRules.foldLeft(false){ (a,b) => a || b._1 }
+    val rules = mappedRules.foldLeft(Seq():Seq[Rule]){ (a, b) => a :+ b._2 }
     (bool, css(rules:_*))
   }
 
   val marginList = List("margin-top", "margin-right", "margin-bottom", "margin-left")
 
-  def aggregateMargins(r: RuleAST): (Boolean, RuleAST) = r match {
+  def aggregateMargins(r: Rule): (Boolean, Rule) = r match {
     case CommentRule(r1,comment) =>
       val (isAggregated, r2) = aggregateMargins(r1)
       (isAggregated, CommentRule(r2, comment) )
@@ -35,7 +35,7 @@ trait Lint extends LintDSL with Base with Property with Value with Rule {
       val hasNotAll: Boolean = mappedMargins.exists(_.isEmpty)
       if (hasNotAll) (false, r) else {
         val indexFirst: Int = declarations.indexWhere(d=>marginList.contains(d.getProperty))
-        val dMargin = prop("margin")  := value(mappedMargins.flatten.mkString(" "))
+        val dMargin = prop("margin") := value(mappedMargins.flatten.mkString(" "))
         val aggregated = declarations.updated(indexFirst,dMargin).filterNot(d=>marginList.contains(d.getProperty))
         (true, ARule(s,aggregated))
       }
@@ -45,8 +45,8 @@ trait Lint extends LintDSL with Base with Property with Value with Rule {
   /**
     * Check if the given sheet contains strictly more than n 'float' properties and, if so, returns true, otherwise false.
     */
-  override def limitFloats(css: CssAST, n: Integer): Boolean =
-    n < css.rules.map(r=>r.mapDeclarations({d:DeclarationAST=> if (d.hasProperty("float")) 1 else 0}).sum).sum
+  override def limitFloats(css: Css, n: Integer): Boolean =
+    n < css.getRules.map( r => r.mapDeclarations({ d => if (d.hasProperty("float")) 1 else 0 }).sum ).sum
 
 
   //    n < countFloats(css)
