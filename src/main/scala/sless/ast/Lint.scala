@@ -7,16 +7,14 @@ trait Lint extends LintDSL with Base with Property with Value {
     * Check if the given sheet has any style rules without declarations, i.e. of the form "selector {}"
     */
   override def removeEmptyRules(css: CssAST): (Boolean, CssAST) =
-    ( css.rules.exists(isEmptyRule) , CssAST(css.rules.filterNot(isEmptyRule)))
+    ( css.rules.exists(isEmptyRule) , fromRules(css.rules.filterNot(isEmptyRule)))
 
 
   def isEmptyRule(rule: RuleAST): Boolean = rule match {
-    case ARule(_,Nil) => true
+    case ARule(_,declarations) => declarations == Nil
     case CommentRule(r,_) => isEmptyRule(r)
-    case _ => false
   }
 
-  def dropEmptyRules(rules: Seq[Lint.this.RuleAST]): Seq[RuleAST] = rules.filterNot(r=>isEmptyRule(r))
 
   /**
     * Check if the given sheet has any style rules with a  declaration for all four properties from the set
@@ -24,51 +22,43 @@ trait Lint extends LintDSL with Base with Property with Value {
     * the single shorthand property margin. The new margin property takes the place of the first declaration in order of appearance.
     * The values from the individual prorperties are aggregated in the order top-right-bottom-left, with spaces in between.
     */
-  override def aggregateMargins(css: CssAST): (Boolean, CssAST) =
-      ( css.rules.exists(hasAllMargins)  , CssAST(css.rules.map(transformRule(_,marginList))) )
+  override def aggregateMargins(css: CssAST): (Boolean, CssAST) = {
+    val mappedRules = css.rules.map (aggregateMargins)
+    val bool = mappedRules.foldLeft(false){ case(a, (b, _)) => b || a   }
+    val rules = mappedRules.foldLeft(Seq():Seq[RuleAST]){(a,b) => a:+b._2}
+    (bool, fromRules(rules))
+  }
 
+  val marginList = List("margin-top", "margin-right", "margin-bottom", "margin-left")
 
-  def hasAllMargins(rule: RuleAST): Boolean = hasAllProperties(rule, marginList)
-
-  def hasAllProperties(rule: RuleAST, props: List[String]): Boolean =
-    props.map(p=>hasProperty(rule,p)).fold(true)(_ && _)
-
-  def hasProperty(rule: RuleAST, prop: String): Boolean = rule match {
-    case ARule(_,Nil) => false
-    case CommentRule(r,comment) => hasProperty(r,prop)
-    case ARule(s, declarations) => declarations.exists(d=>hasProperty(d,prop))
+  def aggregateMargins(r: RuleAST): (Boolean, RuleAST) = r match {
+    case CommentRule(r1,comment) =>
+      val (aggregated, r2) = aggregateMargins(r1)
+      (aggregated, CommentRule(r2, comment) )
+    case ARule(s,declarations) =>
+      val mappedMargins = marginList.map(m=>declarations.map(d=>getValueOfProperty(d,m)).fold(None)(reduceOption))
+      val hasNotAll: Boolean = mappedMargins.exists(_.isEmpty)
+      if (hasNotAll) (false, r) else {
+        val indexFirst: Int = declarations.indexWhere(d=>marginList.contains(getProperty(d)))
+        val dmargin = prop("margin")  := value(mappedMargins.flatten.mkString(" "))
+        val d2 = declarations.updated(indexFirst,dmargin).filterNot(d=>marginList.contains(getProperty(d)))
+        (true, ARule(s,d2))
+      }
   }
 
   def hasProperty(declaration: DeclarationAST, prop: String): Boolean = declaration match {
-//      case ADeclaration(Nil,_)  => false
-    case CommentDeclaration(d,comment) => hasProperty(d,prop)
-    case ADeclaration(AProperty(pvalue), dvalue) => pvalue.equals(prop)
+    case CommentDeclaration(d,_) => hasProperty(d,prop)
+    case ADeclaration(AProperty(pvalue), _) => pvalue == prop
   }
 
-  def getValue(d: DeclarationAST, prop: String): Option[String] = d match {
-    case ADeclaration(AProperty(pvalue), AValue(value)) => if (pvalue.equals(prop)) Some(value) else None
-    case CommentDeclaration(d, comment) => getValue(d,prop)
+  def getValueOfProperty(d: DeclarationAST, property: String): Option[String] = d match {
+    case ADeclaration(AProperty(pvalue), AValue(value)) => if (pvalue.equals(property)) Some(value) else None
+    case CommentDeclaration(d, _) => getValueOfProperty(d,property)
   }
 
   def getProperty(d: DeclarationAST): String = d match {
     case ADeclaration(AProperty(pvalue), _) => pvalue
-    case CommentDeclaration(d, comment) => getProperty(d)
-  }
-
-  def getValue(declarations: Seq[DeclarationAST], prop: String) : Option[String] =
-    declarations.map(getValue(_,prop)).fold(None)(reduceOption)
-
-  def transformRule(r: RuleAST, props: List[String]): RuleAST = r match {
-    case CommentRule(r1,comment) => CommentRule(transformRule(r1,props), comment)
-    case ARule(s,declarations) =>
-      val mappedMargins = props.map(getValue(declarations,_))
-      val hasNotAll: Boolean = mappedMargins.exists(_.isEmpty)
-      if (hasNotAll) r else {
-        val indexFirst: Int = declarations.indexWhere(d=>props.contains(getProperty(d)))
-        val margindDecl = prop("margin")  := value(mappedMargins.flatten.mkString(" "))
-        val d2 = declarations.updated(indexFirst,margindDecl).filterNot(d=>props.contains(getProperty(d)))
-        ARule(s,d2)
-      }
+    case CommentDeclaration(d, _) => getProperty(d)
   }
 
   def reduceOption(opt1: Option[String], opt2: Option[String] ): Option[String] = opt1 match {
@@ -76,7 +66,7 @@ trait Lint extends LintDSL with Base with Property with Value {
     case Some(_) => opt1
   }
 
-    val marginList = List("margin-top", "margin-right", "margin-bottom", "margin-left")
+
 
 
   /**
