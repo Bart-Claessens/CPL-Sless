@@ -21,10 +21,7 @@ trait Compiler extends Compilable with Base {
     case AttributeSelector(s,attr,value) => compileHelper(s) + "[" + attr + "=" +  value + "]"
     case PseudoClassSelector(s,pseudoClass) => compileHelper(s) + ":" + pseudoClass
     case PseudoElementSelector(s,psuedoElement) =>compileHelper(s) + "::" + psuedoElement
-    case DescendantSelector(s,selector) => compileHelper(s) + " " + compileHelper(selector)
-    case ChildSelector(s,selector) => compileHelper(s) + ">" + compileHelper(selector)
-    case AdjacentSelector(s,selector) => compileHelper(s) + "+" + compileHelper(selector)
-    case GeneralSelector(s,selector) => compileHelper(s) + "~" + compileHelper(selector)
+    case CombinatorSelector(s,selector,combinator) => compileHelper(s) + combinator + compileHelper(selector)
     case CommentDeclaration(d,comment) => compileHelper(d) + "/* " + comment + " */"
     case CommentRule(r,comment) => "/* " + comment + " */" + compileHelper(r)
   }

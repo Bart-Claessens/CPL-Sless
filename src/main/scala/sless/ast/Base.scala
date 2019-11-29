@@ -34,11 +34,30 @@ trait Base extends BaseDSL {
   case class PseudoClassSelector(s: Selector, string: String) extends  Selector
   case class PseudoElementSelector(s: Selector, string: String) extends  Selector
 
-  case class DescendantSelector(s: Selector, selector: Selector) extends  Selector
-  case class ChildSelector(s: Selector, selector: Selector) extends  Selector
-  case class AdjacentSelector(s: Selector, selector: Selector) extends  Selector
-  case class GeneralSelector(s: Selector, selector: Selector) extends  Selector
+  sealed trait CombinatorSelector extends Selector {
+    def s : Selector
+    def selector : Selector
+    def combinator: String
+  }
+  case class DescendantSelector(s: Selector, selector: Selector) extends  CombinatorSelector {
+    override def combinator: String = " "
+  }
+  case class ChildSelector(s: Selector, selector: Selector) extends  CombinatorSelector {
+    override def combinator: String = ">"
+  }//(s,selector, ">")
+  case class AdjacentSelector(s: Selector, selector: Selector) extends  CombinatorSelector {
+    override def combinator: String = "+"
+  }//(s,selector, "+")
+  case class GeneralSelector(s: Selector, selector: Selector) extends  CombinatorSelector {
+    override def combinator: String = "~"
+  }//(s,selector, "~")
 
+  object CombinatorSelector {
+    def unapply(c: CombinatorSelector): Option[(Selector, Selector,String)] =
+      Option(c) map { c =>
+        (c.s, c.selector,c.combinator)
+      }
+  }
   sealed abstract class DeclarationAST extends CompilableAST
   case class ADeclaration(p: Property, value: Value) extends Declaration
   case class CommentDeclaration(d: Declaration, comment: String) extends Declaration
