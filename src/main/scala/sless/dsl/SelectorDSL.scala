@@ -41,7 +41,7 @@ trait SelectorDSL extends BaseDSL {
     def at(attr: String, value: Value): Selector = attribute(s, attr, value)
 
     def :|(pseudo: String): Selector = pseudoClass(s, pseudo)
-    def ::(pseudoEl: String): Selector = pseudoElement(s, pseudoEl)
+    def :/(pseudoEl: String): Selector = pseudoElement(s, pseudoEl)
 
     def |~(selector: Selector): Selector = general(s, selector)
     def |+(selector: Selector): Selector = adjacent(s, selector)
