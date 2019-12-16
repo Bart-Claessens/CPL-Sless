@@ -31,5 +31,5 @@ trait Selector extends SelectorDSL with Base {
 
   override val All: Selector = UniversalSelector
 
-  override protected def bindTo(s: Selector, declarations: Seq[Declaration]): Rule = ARule(s,declarations)
+  override protected def bindTo(s: Selector, declarations: Seq[Declaration]): Rule = CommentRule(s,declarations,null)
 }

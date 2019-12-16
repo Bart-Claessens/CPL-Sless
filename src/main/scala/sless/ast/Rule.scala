@@ -3,13 +3,11 @@ package sless.ast
 trait Rule extends Base {
 
   def isEmptyRule(rule: Rule): Boolean = rule match {
-    case ARule(_, declarations) => declarations == Nil
-    case CommentRule(r, _) => isEmptyRule(r)
+    case CommentRule(_, declarations, _) => declarations == Nil
   }
 
   def mapDeclarationsOfRule[A](rule: Rule, f: Declaration => A): Seq[A] = rule match {
-    case ARule(s, declarations) => declarations.map(f)
-    case CommentRule(r, _) => mapDeclarationsOfRule(r,f)
+    case CommentRule(_, declarations, _) => declarations.map(f)
   }
 
   def getRulesFrom(sheet: Css): Seq[Rule] = sheet match {
@@ -17,10 +15,9 @@ trait Rule extends Base {
   }
 
 
-//  def transformDeclarationsOfRule(rule: RuleAST, f: DeclarationAST => DeclarationAST): RuleAST = rule match {
-//    case ARule(s, declarations) => ARule(s, declarations.map(f))
-//    case CommentRule(r, comment) => CommentRule(transformDeclarationsOfRule(r,f),comment)
-//  }
+  def transformDeclarationsOfRule(rule: RuleAST, f: DeclarationAST => DeclarationAST): RuleAST = rule match {
+    case CommentRule(s, declarations, comment) => CommentRule(s, declarations.map(f), comment)
+  }
 
   implicit class CssShorthand(c: Css) {
     def getRules: Seq[Rule] = getRulesFrom(c)

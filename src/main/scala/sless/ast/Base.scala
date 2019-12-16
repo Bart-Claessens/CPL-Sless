@@ -19,8 +19,8 @@ trait Base extends BaseDSL {
   case class ACss(rules : Seq[Rule]) extends Css
 
   sealed abstract class RuleAST extends CompilableAST
-  case class ARule(s: Selector, declarations: Seq[Declaration]) extends Rule
-  case class CommentRule(r: Rule, comment: String) extends Rule
+  //case class ARule(s: Selector, declarations: Seq[Declaration]) extends Rule
+  case class CommentRule(s: Selector, declarations: Seq[Declaration], comment: String) extends Rule
 
   sealed abstract class SelectorAST extends CompilableAST
   case object UniversalSelector extends  Selector
@@ -40,8 +40,8 @@ trait Base extends BaseDSL {
   case class GeneralSelector(s: Selector, selector: Selector) extends  Selector
 
   sealed abstract class DeclarationAST extends CompilableAST
-  case class ADeclaration(p: Property, value: Value) extends Declaration
-  case class CommentDeclaration(d: Declaration, comment: String) extends Declaration
+  //case class ADeclaration(p: Property, value: Value) extends Declaration
+  case class CommentDeclaration(p: Property, value: Value, comment: String) extends Declaration
 
   sealed abstract class PropertyAST extends CompilableAST
   case class AProperty(value: String) extends Property
