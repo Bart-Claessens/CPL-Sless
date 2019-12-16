@@ -9,8 +9,10 @@ trait Compiler extends Compilable with Base {
 
   def compileHelper(compilable: CompilableAST): String =  compilable match {
     case ACss(rules) => rules.map(r => compileHelper(r)).mkString("")
-    case ARule(s,declarations) => compileHelper(s) + "{" + declarations.map(d => compileHelper(d)).mkString("") + "}"
-    case ADeclaration(p, value) => compileHelper(p)+ ":" + compileHelper(value) + ";"
+    case CommentRule(s,declarations,comment) => (if (comment==null) "" else "/* " + comment + " */") +
+      compileHelper(s) + "{" + declarations.map(d => compileHelper(d)).mkString("") + "}"
+    case CommentDeclaration(p, value,comment) => compileHelper(p) + ":" + compileHelper(value) + ";" +
+      (if (comment==null) "" else "/* " + comment + " */")
     case AValue(value) => value
     case AProperty(value) => value
     case UniversalSelector => "*"
@@ -25,15 +27,16 @@ trait Compiler extends Compilable with Base {
     case ChildSelector(s,selector) => compileHelper(s) + ">" + compileHelper(selector)
     case AdjacentSelector(s,selector) => compileHelper(s) + "+" + compileHelper(selector)
     case GeneralSelector(s,selector) => compileHelper(s) + "~" + compileHelper(selector)
-    case CommentDeclaration(d,comment) => compileHelper(d) + "/* " + comment + " */"
-    case CommentRule(r,comment) => "/* " + comment + " */" + compileHelper(r)
+//    case CommentDeclaration(d,comment) => compileHelper(d) + "/* " + comment + " */"
+//    case CommentRule(r,comment) => "/* " + comment + " */" + compileHelper(r)
   }
 
   def prettyHelper(compilable: CompilableAST, spaces: Int): String =  compilable match {
     case ACss(rules) => rules.map(r => prettyHelper(r,spaces)).mkString("\n\n")
-    case ARule(s, declarations)
-      => prettyHelper(s,spaces) + " {\n" + declarations.map(d => prettyHelper(d,spaces)).mkString("\n") + "\n}"
-    case ADeclaration(p, value) => " " * spaces + prettyHelper(p,spaces) + ": " + prettyHelper(value,spaces) + ";"
+    case CommentRule(s, declarations, comment) => (if (comment==null) "" else "/* " + comment + " */\n") +
+      prettyHelper(s,spaces) + " {\n" + declarations.map(d => prettyHelper(d,spaces)).mkString("\n") + "\n}"
+    case CommentDeclaration(p, value, comment) => " " * spaces + prettyHelper(p,spaces) + ": " + prettyHelper(value,spaces) + ";" +
+      (if (comment==null) "" else " /* " + comment + " */")
     case AValue(value) => value
     case AProperty(value) => value
     case UniversalSelector => "*"
@@ -48,7 +51,7 @@ trait Compiler extends Compilable with Base {
     case ChildSelector(s,selector) => prettyHelper(s,spaces) + " > " + prettyHelper(selector,spaces)
     case AdjacentSelector(s,selector) => prettyHelper(s,spaces) + " + " + prettyHelper(selector,spaces)
     case GeneralSelector(s,selector) => prettyHelper(s,spaces) + " ~ " + prettyHelper(selector,spaces)
-    case CommentDeclaration(d,comment) => prettyHelper(d,spaces) + " /* " + comment + " */"
-    case CommentRule(r,comment) => "/* " + comment + " */\n" + prettyHelper(r,spaces)
+//    case CommentDeclaration(d,comment) => prettyHelper(d,spaces) + " /* " + comment + " */"
+//    case CommentRule(r,comment) => "/* " + comment + " */\n" + prettyHelper(r,spaces)
   }
 }
