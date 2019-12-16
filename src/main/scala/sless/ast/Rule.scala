@@ -14,6 +14,9 @@ trait Rule extends Base {
     case ACss(rules) => rules
   }
 
+  def getSelectorFrom(rule: Rule): Selector = rule match {
+    case CommentRule(s,_,_) => s
+  }
 
   def transformDeclarationsOfRule(rule: RuleAST, f: DeclarationAST => DeclarationAST): RuleAST = rule match {
     case CommentRule(s, declarations, comment) => CommentRule(s, declarations.map(f), comment)
@@ -26,6 +29,7 @@ trait Rule extends Base {
   implicit class RuleShorthand(r: Rule) {
     def isEmpty: Boolean = isEmptyRule(r)
     def mapDeclarations[A](f: Declaration => A): Seq[A] = mapDeclarationsOfRule(r,f)
+    def getSelector: Selector = getSelectorFrom(r)
   }
 
 }
