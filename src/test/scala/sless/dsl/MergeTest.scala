@@ -77,7 +77,7 @@ class MergeTest extends  FunSuite{
       )
     )
 
-    val ex = mergeSheets(ex1,ex2)
+    val ex = mergeSheets(ex1,ex2,ex3)
 
 
     assert(

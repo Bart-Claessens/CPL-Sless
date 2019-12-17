@@ -23,6 +23,7 @@ trait Base extends BaseDSL {
   case class CommentRule(s: Selector, declarations: Seq[Declaration], comment: String) extends Rule
 
   sealed abstract class SelectorAST extends CompilableAST
+  case object EmptySelector extends Selector
   case object UniversalSelector extends  Selector
   case class TypeSelector(string: String) extends  Selector
   case class GroupSelector(selectors: Seq[Selector]) extends  Selector

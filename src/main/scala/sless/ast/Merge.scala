@@ -10,7 +10,7 @@ trait Merge extends MergeDSL with Base with Property with Value with Rule with S
   def mergeRules(rules1: Seq[Rule], rules2: Seq[Rule], result: Seq[Rule]): Seq[Rule] = rules2 match {
     case Seq() => rules1 match {
       case Seq() => result
-      case _ => mergeRules(rules1.dropRight(1), rules2, rules1.last +: result)
+      case _ => rules1.filterNot(r=>r.getSelector==Empty) ++ result
     }
     case _ => {
       val rule2 = rules2.last
@@ -31,10 +31,15 @@ trait Merge extends MergeDSL with Base with Property with Value with Rule with S
     case CommentRule(sl,d, comment) => right match {
       case CommentRule(sr,_,_) => sl match {
         case GroupSelector(selectors) =>
-          if (selectors.contains(sr)) ( CommentRule(GroupSelector(selectors.filter(_!=sr)),d,comment ), d)
-          else (left, Seq())
+          if (selectors.contains(sr)) {
+            val sel = selectors.filter(_!=sr)
+            val newsel = if (sel.isEmpty) Empty else GroupSelector(sel)
+            (CommentRule(newsel,d,comment ), d)
+          }
+          else
+            (left, Seq())
         case _ =>
-          if (sl == sr) (CommentRule(All,d,comment), d)
+          if (sl == sr) (CommentRule(Empty,d,comment), d)
           else (left, Seq())
       }
     }
