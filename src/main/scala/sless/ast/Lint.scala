@@ -23,12 +23,12 @@ trait Lint extends LintDSL with Base with Property with Value with Rule {
     (bool, css(rules:_*))
   }
 
-  val marginList = List("margin-top", "margin-right", "margin-bottom", "margin-left")
+  val marginList = List(AProperty("margin-top"), AProperty("margin-right"),
+    AProperty("margin-bottom"), AProperty("margin-left"))
 
   def aggregateMargins(r: Rule): (Boolean, Rule) = r match {
     case CommentRule(s,declarations,comment) =>
-      val mappedMargins = marginList.map(m=>declarations.map(d=>d.getValueOfProperty(m))
-        .fold(None){(o1,o2) => if (o1.isEmpty) o2 else o1})
+      val mappedMargins = marginList.map( m=> r.getValueOfProperty(m).map(_.getString) )
       val hasNotAll: Boolean = mappedMargins.exists(_.isEmpty)
       if (hasNotAll) (false, r) else {
         val indexFirst: Int = declarations.indexWhere(d=>marginList.contains(d.getProperty))
@@ -43,7 +43,7 @@ trait Lint extends LintDSL with Base with Property with Value with Rule {
     * Check if the given sheet contains strictly more than n 'float' properties and, if so, returns true, otherwise false.
     */
   override def limitFloats(css: Css, n: Integer): Boolean =
-    n < css.getRules.map( r => r.mapDeclarations({ d => if (d.hasProperty("float")) 1 else 0 }).sum ).sum
+    n < css.getRules.map( r => r.mapDeclarations({ d => if (d.hasProperty(AProperty("float"))) 1 else 0 }).sum ).sum
 
 }
 
