@@ -18,6 +18,10 @@ trait Rule extends Base {
     case CommentRule(s,_,_) => s
   }
 
+  def getDeclarationsFrom(rule: Rule): Seq[Declaration] = rule match {
+    case CommentRule(_,d,_) => d
+  }
+
   def transformDeclarationsOfRule(rule: RuleAST, f: DeclarationAST => DeclarationAST): RuleAST = rule match {
     case CommentRule(s, declarations, comment) => CommentRule(s, declarations.map(f), comment)
   }
@@ -30,6 +34,7 @@ trait Rule extends Base {
     def isEmpty: Boolean = isEmptyRule(r)
     def mapDeclarations[A](f: Declaration => A): Seq[A] = mapDeclarationsOfRule(r,f)
     def getSelector: Selector = getSelectorFrom(r)
+    def getDeclarations = getDeclarationsFrom(r)
   }
 
 }
