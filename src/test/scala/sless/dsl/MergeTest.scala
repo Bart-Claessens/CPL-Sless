@@ -52,6 +52,33 @@ class MergeTest extends  FunSuite{
         """*.class-name2{width:100%;}*.class-name1{background-color:blue;width:95%;}""")
   }
 
+  test("Occurs twice in rightmost") {
+    val backgroundColor = prop("background-color")
+
+    val ex1 = css(
+      All.c("class-name1") (
+        backgroundColor := value("blue"),
+        prop("width") := value("95%")
+      )
+    )
+
+    val ex2 = css(
+      All.c("class-name1") (
+        prop("width") := value("80%")
+      ),
+      All.c("class-name1") (
+        backgroundColor := value("red"),
+      )
+    )
+
+    val ex = mergeSheets(ex1,ex2)
+
+
+    assert(
+      MergeImplementation.dsl.compile(ex) ===
+        """*.class-name1{width:80%;}*.class-name1{background-color:red;width:95%;}""")
+  }
+
   test("Extended merge test") {
     val backgroundColor = prop("background-color")
 
