@@ -43,7 +43,7 @@ trait Lint extends LintDSL with Base with Property with Value with Rule {
     * Check if the given sheet contains strictly more than n 'float' properties and, if so, returns true, otherwise false.
     */
   override def limitFloats(css: Css, n: Integer): Boolean =
-    n < css.getRules.map( r => r.mapDeclarations({ d => if (d.hasProperty(AProperty("float"))) 1 else 0 }).sum ).sum
+    n < css.getRules.map( r => r.getDeclarations.map({ d => if (d.hasProperty(AProperty("float"))) 1 else 0 }).sum ).sum
 
 }
 

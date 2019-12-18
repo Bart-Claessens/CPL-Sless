@@ -27,8 +27,6 @@ trait Compiler extends Compilable with Base {
     case ChildSelector(s,selector) => compileHelper(s) + ">" + compileHelper(selector)
     case AdjacentSelector(s,selector) => compileHelper(s) + "+" + compileHelper(selector)
     case GeneralSelector(s,selector) => compileHelper(s) + "~" + compileHelper(selector)
-//    case CommentDeclaration(d,comment) => compileHelper(d) + "/* " + comment + " */"
-//    case CommentRule(r,comment) => "/* " + comment + " */" + compileHelper(r)
   }
 
   def prettyHelper(compilable: CompilableAST, spaces: Int): String =  compilable match {
@@ -51,7 +49,5 @@ trait Compiler extends Compilable with Base {
     case ChildSelector(s,selector) => prettyHelper(s,spaces) + " > " + prettyHelper(selector,spaces)
     case AdjacentSelector(s,selector) => prettyHelper(s,spaces) + " + " + prettyHelper(selector,spaces)
     case GeneralSelector(s,selector) => prettyHelper(s,spaces) + " ~ " + prettyHelper(selector,spaces)
-//    case CommentDeclaration(d,comment) => prettyHelper(d,spaces) + " /* " + comment + " */"
-//    case CommentRule(r,comment) => "/* " + comment + " */\n" + prettyHelper(r,spaces)
   }
 }

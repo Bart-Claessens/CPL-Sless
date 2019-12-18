@@ -6,10 +6,6 @@ trait Rule extends Base with Property {
     case CommentRule(_, declarations, _) => declarations == Nil
   }
 
-  def mapDeclarationsOfRule[A](rule: Rule, f: Declaration => A): Seq[A] = rule match {
-    case CommentRule(_, declarations, _) => declarations.map(f)
-  }
-
   def getRulesFrom(sheet: Css): Seq[Rule] = sheet match {
     case ACss(rules) => rules
   }
@@ -20,10 +16,6 @@ trait Rule extends Base with Property {
 
   def getDeclarationsFrom(rule: Rule): Seq[Declaration] = rule match {
     case CommentRule(_,d,_) => d
-  }
-
-  def transformDeclarationsOfRule(rule: RuleAST, f: DeclarationAST => DeclarationAST): Rule = rule match {
-    case CommentRule(s, declarations, comment) => CommentRule(s, declarations.map(f), comment)
   }
 
   def ruleHasProperty(rule: Rule, property: Property): Boolean = {
@@ -42,7 +34,6 @@ trait Rule extends Base with Property {
 
   implicit class RuleShorthand(r: Rule) {
     def isEmpty: Boolean = isEmptyRule(r)
-    def mapDeclarations[A](f: Declaration => A): Seq[A] = mapDeclarationsOfRule(r,f)
     def getSelector: Selector = getSelectorFrom(r)
     def getDeclarations = getDeclarationsFrom(r)
     def hasProperty(p: Property): Boolean = ruleHasProperty(r,p)
