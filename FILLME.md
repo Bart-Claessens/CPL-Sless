@@ -5,7 +5,7 @@
 Briefly explain which files you have to change to introduce a new sless feature, e.g. add a new pseudo-class/-element, add support for namespaces, add at-rules, etc. 
 Hint: if this lists all the files in your project you should reevaluate your implementation.
 
-    Adding 
+    Adding a new feature
     
 ## Extra
 

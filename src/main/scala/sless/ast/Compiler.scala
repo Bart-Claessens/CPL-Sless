@@ -27,6 +27,7 @@ trait Compiler extends Compilable with Base {
     case ChildSelector(s,selector) => compileHelper(s) + ">" + compileHelper(selector)
     case AdjacentSelector(s,selector) => compileHelper(s) + "+" + compileHelper(selector)
     case GeneralSelector(s,selector) => compileHelper(s) + "~" + compileHelper(selector)
+    case EmptySelector => throw new Exception("EmptySelector should be removed before compile")
   }
 
   def prettyHelper(compilable: CompilableAST, spaces: Int): String =  compilable match {
@@ -49,5 +50,6 @@ trait Compiler extends Compilable with Base {
     case ChildSelector(s,selector) => prettyHelper(s,spaces) + " > " + prettyHelper(selector,spaces)
     case AdjacentSelector(s,selector) => prettyHelper(s,spaces) + " + " + prettyHelper(selector,spaces)
     case GeneralSelector(s,selector) => prettyHelper(s,spaces) + " ~ " + prettyHelper(selector,spaces)
+    case EmptySelector => throw new Exception("EmptySelector should be removed before compile")
   }
 }
