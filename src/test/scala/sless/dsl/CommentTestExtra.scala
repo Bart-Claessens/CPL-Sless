@@ -9,6 +9,7 @@ class CommentTestExtra extends FunSuite {
     val backgroundColor = prop("background-color")
     val container = tipe("div") ## "container"
 
+    /* Assumption: only one comment per rule/declaration */
     val ex = css(
       (N(All.c("class-name1"), All.c("class-name2")) {
         prop("width") := value("100%")
@@ -22,16 +23,5 @@ class CommentTestExtra extends FunSuite {
       compile(ex) ===
         """/* this comment overwrites the previous one */*.class-name1,*.class-name2{width:100%;}div#container{background-color:blue;/* bg is blue */}""")
 
-
-    assert(
-      pretty(ex, 4) ===
-        """/* this comment overwrites the previous one */
-*.class-name1, *.class-name2 {
-    width: 100%;
-}
-
-div#container {
-    background-color: blue; /* bg is blue */
-}""")
   }
 }
